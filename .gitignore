@@ -1,0 +1,32 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Maven
+target/
+*.jar
+*.war
+*.ear
+.m2/
+
+# Java
+*.class
+*.log
+
+# Spring Boot
+application-dev.properties
+application-prod.properties
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project
+*.iml
+.classpath
+.project
+.settings/
+*.factorypath
