@@ -87,7 +87,6 @@
 </head>
 <body>
 
-    <!-- 導航欄 -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-5">
         <div class="container">
             <a class="navbar-brand" href="#">📚 Cloud Library System</a>
@@ -95,12 +94,9 @@
         </div>
     </nav>
 
-    <!-- 主容器 -->
     <div class="container">
-        <!-- 通知訊息區域 -->
         <div id="alertContainer"></div>
 
-        <!-- 分頁標籤 -->
         <ul class="nav nav-tabs mb-4" id="consoleTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="reader-tab" data-bs-toggle="tab" data-bs-target="#readerConsole" type="button" role="tab">
@@ -114,17 +110,14 @@
             </li>
         </ul>
 
-        <!-- 分頁內容 -->
         <div class="tab-content" id="consoleTabContent">
             
-            <!-- 【讀者操作端】 -->
             <div class="tab-pane fade show active" id="readerConsole" role="tabpanel">
                 <div class="row">
                     <div class="col-md-12 mb-4">
                         <div class="card p-4">
                             <h5 class="card-title mb-3">🔍 線上圖書即時檢索 (防 SQL 注入模糊查詢)</h5>
                             
-                            <!-- 搜尋欄位 -->
                             <div class="input-group mb-4">
                                 <input 
                                     type="text" 
@@ -146,7 +139,6 @@
                                 </button>
                             </div>
                             
-                            <!-- 書籍列表表格 -->
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle">
                                     <thead class="table-light">
@@ -169,7 +161,6 @@
                                 </table>
                             </div>
 
-                            <!-- 說明區塊 -->
                             <div class="alert alert-info mt-3 mb-0">
                                 <strong>💡 使用提示：</strong><br>
                                 ✓ 在上方搜尋框輸入書籍名稱或作者，系統會執行「防 SQL 注入」的模糊查詢<br>
@@ -181,10 +172,8 @@
                 </div>
             </div>
 
-            <!-- 【系統管理員主控台】 -->
             <div class="tab-pane fade" id="adminConsole" role="tabpanel">
                 <div class="row">
-                    <!-- 環境說明卡片 -->
                     <div class="col-md-12 mb-4">
                         <div class="card p-4">
                             <h5 class="card-title mb-3">🛠️ 後台環境與測試資料說明</h5>
@@ -196,7 +185,6 @@
                         </div>
                     </div>
 
-                    <!-- 測試帳號卡片 -->
                     <div class="col-md-6 mb-4">
                         <div class="card p-4">
                             <h5 class="card-title mb-3">👥 模擬讀者測試帳號</h5>
@@ -226,7 +214,6 @@
                         </div>
                     </div>
 
-                    <!-- 技術架構卡片 -->
                     <div class="col-md-6 mb-4">
                         <div class="card p-4">
                             <h5 class="card-title mb-3">🏗️ 系統技術棧</h5>
@@ -251,7 +238,6 @@
                         </div>
                     </div>
 
-                    <!-- ACID 特性說明卡片 -->
                     <div class="col-md-12 mb-4">
                         <div class="card p-4">
                             <h5 class="card-title mb-3">🔒 ACID 交易特性展示</h5>
@@ -303,7 +289,6 @@
                         </div>
                     </div>
 
-                    <!-- 核心代碼流程卡片 -->
                     <div class="col-md-12 mb-4">
                         <div class="card p-4">
                             <h5 class="card-title mb-3">⚡ 核心代碼流程（手動交易控制）</h5>
@@ -338,14 +323,12 @@ try {
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- 前端應用邏輯 -->
     <script>
-        // 設定 API 基礎路徑
-        // 空字串代表同網域呼叫，完美適配本地與雲端生產環境
-        const API_BASE = "";
+        // 【核心修正點】使用標準的相對路徑根節點，完美相容本地 localhost:8080 與雲端生產環境
+        const API_GET_BOOKS = "/api/books";
+        const API_POST_BORROW = "/api/borrow";
 
         // 頁面加載時自動載入書籍
         document.addEventListener("DOMContentLoaded", () => {
@@ -354,11 +337,6 @@ try {
 
         /**
          * 非同步獲取書籍清單 (GET /api/books)
-         * 
-         * 核心特點：
-         * ✓ Fetch API 非同步連線（不阻塞 UI）
-         * ✓ GET 參數防呆驗證
-         * ✓ SQL 注入防護：關鍵字透過 encodeURIComponent 編碼
          */
         async function loadBooks() {
             const keyword = document.getElementById("searchKeyword").value.trim();
@@ -370,15 +348,15 @@ try {
             </td></tr>`;
 
             try {
-                // 使用 encodeURIComponent 防止 URL 注入
-                const response = await fetch(`${API_BASE}/api/books?keyword=${encodeURIComponent(keyword)}`);
+                // 使用確切的相對路徑與安全編碼組合
+                const response = await fetch(`${API_GET_BOOKS}?keyword=${encodeURIComponent(keyword)}`);
                 
                 if (!response.ok) {
                     throw new Error(`伺服器回應異常 (HTTP ${response.status})`);
                 }
                 
                 const result = await response.json();
-                const books = result.data || result;  // 支援兩種回應格式
+                const books = result.data || result;  // 自動相容標準 JSON 包裝格式
                 
                 tbody.innerHTML = "";
 
@@ -425,29 +403,22 @@ try {
                 tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-3">
                     ❌ 載入書籍失敗: ${error.message}
                 </td></tr>`;
-                showAlert("danger", `載入書籍失敗: ${error.message}`);
+                showAlert("danger", `雲端調取失敗，請確認後端 Live 燈號或 API 連線路徑。原果原因: ${error.message}`);
             }
         }
 
         /**
          * 觸發核心手動交易借書 API (POST /api/borrow)
-         * 
-         * 核心特點：
-         * ✓ POST 請求參數防呆驗證
-         * ✓ 後端手動交易控制（setAutoCommit(false)）
-         * ✓ 借書失敗自動回滾（Rollback）
          */
         async function borrowBook(bookId) {
-            // 前端強制使用讀者 Bob (ID: 2) 進行借閱測試
-            const userId = 2; 
+            const userId = 2; // 模擬 Bob 借閱
 
-            // 確認對話框
             if (!confirm(`確認要借閱此書籍嗎？(讀者 ID: ${userId})`)) {
                 return;
             }
 
             try {
-                const response = await fetch(`${API_BASE}/api/borrow`, {
+                const response = await fetch(API_POST_BORROW, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json'
@@ -461,15 +432,12 @@ try {
                 const result = await response.json();
 
                 if (response.ok) {
-                    showAlert("success", `🎉 ${result.message}`);
-                    
-                    // 延遲 1 秒後刷新列表，讓用戶看見變更
+                    showAlert("success", `🎉 ${result.message || '借書成功！'}`);
                     setTimeout(() => {
                         loadBooks();
                     }, 1000);
                 } else {
-                    // 捕捉後端拋出的預期異常 (如被借走、讀者不存在等)
-                    showAlert("warning", `⚠️ 借書中止: ${result.error || '未知錯誤'}`);
+                    showAlert("warning", `⚠️ 借書中止: ${result.error || '欄位驗證不通過或庫存不足'}`);
                 }
             } catch (error) {
                 showAlert("danger", `❌ 網路連線異常: ${error.message}`);
@@ -486,9 +454,6 @@ try {
 
         /**
          * 全域動態 Alert 通知公用函式
-         * 
-         * @param {string} type - alert 類型 (success, danger, warning, info)
-         * @param {string} message - 提示訊息
          */
         function showAlert(type, message) {
             const container = document.getElementById("alertContainer");
@@ -501,7 +466,6 @@ try {
                 </div>
             `;
 
-            // 自動關閉 alert (5 秒後)
             setTimeout(() => {
                 const alertEl = document.getElementById(alertId);
                 if (alertEl) {
@@ -510,17 +474,14 @@ try {
                 }
             }, 5000);
 
-            // 平滑滾動到頂部
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         /**
          * HTML 轉義防止 XSS 攻擊
-         * 
-         * @param {string} text - 原始文本
-         * @returns {string} 轉義後的文本
          */
         function escapeHtml(text) {
+            if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
