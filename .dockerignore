@@ -1,0 +1,12 @@
+target/
+*.class
+*.log
+.m2/
+.DS_Store
+*.swp
+*.swo
+*~
+node_modules/
+.git/
+.env
+.env.local
