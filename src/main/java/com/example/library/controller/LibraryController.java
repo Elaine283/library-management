@@ -359,3 +359,42 @@ public class LibraryController {
         return response;
     }
 }
+package com.example.library.controller; // 確保這裡的 package 名稱與你原本檔案頂部的一致
+
+// 導入 Spring Boot 處理 HTTP 請求與跨域所需的套件
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+// 導入 Java 內建的資料結構
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController // 【重要】這個標籤告訴 Spring，這是一個專門用來提供 RESTful API 的控制器
+@RequestMapping("/api") // 【重要】設定這個控制器底下所有的網址，都會以 /api 作為開頭
+@CrossOrigin(origins = "*") // 【解決 CORS 問題】允許所有外部網域（包含你的 GitHub Pages）來索取資料
+public class LibraryController {
+
+    // 【設定 GET 請求】對應到完整的網址就是 /api/books
+    @GetMapping("/books")
+    public List<Map<String, Object>> getAllBooks() {
+        
+        // 這裡我們先建立一份「假資料 (Mock Data)」來測試連線是否成功
+        // 等連線測試沒問題後，你就可以將這裡改成呼叫你的 BookDAO 去資料庫抓真正的資料
+        List<Map<String, Object>> bookList = new ArrayList<>();
+        
+        // 建立第一本書的資料
+        Map<String, Object> book1 = new HashMap<>();
+        book1.put("id", 1);
+        book1.put("title", "崛起的薪勢力 - 在 Linux 下用 AMD GPU 加速實作");
+        book1.put("author", "劉京洋、趙新達");
+        
+        bookList.add(book1); // 把書加進清單中
+
+        // Spring Boot 會非常聰明地自動將這個 List 轉換成 JSON 格式回傳給前端
+        return bookList; 
+    }
+}
